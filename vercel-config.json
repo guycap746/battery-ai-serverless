@@ -1,12 +1,7 @@
-json{
+{
   "functions": {
     "api/analyze-battery.js": {
       "maxDuration": 30
     }
-  },
-  "env": {
-    "OPENAI_API_KEY": "@openai-api-key",
-    "UPSTASH_REDIS_REST_URL": "@upstash-redis-url",
-    "UPSTASH_REDIS_REST_TOKEN": "@upstash-redis-token"
   }
 }
