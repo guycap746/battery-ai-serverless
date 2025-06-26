@@ -977,7 +977,7 @@
                     imageSize: currentImageData ? Math.round(currentImageData.length * 0.75 / 1024) + ' KB' : '0 KB',
                     userAgent: navigator.userAgent,
                     timestamp: new Date().toISOString(),
-                    endpoint: '/api/analyze-battery'
+                    endpoint: '/.netlify/functions/analyze-battery'
                 });
             } finally {
                 loading.style.display = 'none';
