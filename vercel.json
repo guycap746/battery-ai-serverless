@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/analyze-battery.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/analyze-battery", "dest": "api/analyze-battery.js" }
+  ]
+}
