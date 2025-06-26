@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battery AI - Serverless</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            
+            --bg-dark: #0f0f23;
+            --bg-card: #1a1a3e;
+            --bg-glass: rgba(255, 255, 255, 0.05);
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            
+            --border: rgba(255, 255, 255, 0.1);
+            --border-focus: rgba(99, 102, 241, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 40% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 60%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            padding: 48px;
+            box-shadow: 
+                0 32px 64px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .brand-badge {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .main-title {
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 50%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 500px;
+            margin: 0 auto 32px;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 24px;
+            padding: 60px 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(99, 102, 241, 0.03);
+            position: relative;
+            overflow: hidden;
+            margin: 24px 0;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .upload-area:hover::before {
+            left: 100%;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.06);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--accent);
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 40px rgba(6, 182, 212, 0.2);
+        }
+
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .upload-hint {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Preview */
+        .preview-container {
+            margin: 24px 0;
+            display: none;
+            text-align: center;
+        }
+
+        .preview-image {
+            width: 100%;
+            max-height: 350px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+        }
+
+        .image-info {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: var(--accent);
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Analyze Button */
+        .analyze-btn {
+            width: 100%;
+            padding: 18px 32px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            margin: 24px 0;
+            font-family: inherit;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .analyze-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .analyze-btn:hover::before {
+            left: 100%;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 24px 0;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(99, 102, 241, 0.3);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 1rem;
+        }
+
+        /* Results Section */
+        .results {
+            margin-top: 32px;
+            display: none;
+        }
+
+        .results-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .battery-details {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            margin: 16px 0;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+
+        .battery-details:hover {
+            border-color: var(--border-focus);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .battery-details.is-battery {
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .battery-details.not-battery {
+            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .battery-details h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .battery-details.is-battery h4 {
+            color: var(--success);
+        }
+
+        .battery-details.not-battery h4 {
+            color: var(--error);
+        }
+
+        .battery-details p {
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .battery-details strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--error);
+            padding: 16px 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .debug-info {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--warning);
+            padding: 16px 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            text-align: left;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .debug-toggle {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .debug-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Footer Badge */
+        .footer-badge {
+            text-align: center;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .serverless-badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .main-container {
+                padding: 32px 24px;
+            }
+
+            .upload-area {
+                padding: 40px 20px;
+            }
+
+            .upload-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
+
+            .main-title {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 24px 20px;
+            }
+
+            .upload-area {
+                padding: 32px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-badge">⚡ SERVERLESS AI</div>
+            <h1 class="main-title">Battery AI</h1>
+            <p class="subtitle">Serverless battery identification with cloud-managed infrastructure</p>
+        </div>
+
+        <!-- Upload Area -->
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon">📷</div>
+            <div class="upload-text">Upload battery image</div>
+            <div class="upload-hint">Click here or drag & drop • JPG, PNG, WebP</div>
+        </div>
+
+        <input type="file" id="fileInput" class="file-input" accept="image/*" capture="environment">
+        
+        <!-- Preview -->
+        <div class="preview-container" id="previewContainer">
+            <img id="previewImage" class="preview-image" alt="Battery preview">
+            <div id="imageInfo" class="image-info" style="display: none;"></div>
+        </div>
+
+        <!-- Analyze Button -->
+        <button class="analyze-btn" id="analyzeBtn" onclick="analyzeImage()" disabled>
+            ⚡ Analyze Battery
+        </button>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Analyzing with AI vision...</div>
+        </div>
+
+        <!-- Results -->
+        <div class="results" id="results">
+            <h3 class="results-header">Analysis Results</h3>
+            <div id="resultsContent"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-badge">
+            <div class="serverless-badge">🚀 Powered by Vercel + Upstash</div>
+        </div>
+    </div>
+
+    <script>
+        let currentImageData = null;
+
+        // File input handling
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+        // Drag and drop handling
+        const uploadArea = document.querySelector('.upload-area');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('Please select a valid image file.');
+                return;
+            }
+
+            // Show loading state during image processing
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+            loading.querySelector('.loading-text').textContent = 'Processing image...';
+
+            // Resize image before processing
+            resizeImage(file, (resizedDataUrl) => {
+                currentImageData = resizedDataUrl;
+                
+                const previewContainer = document.getElementById('previewContainer');
+                const previewImage = document.getElementById('previewImage');
+                
+                previewImage.src = currentImageData;
+                previewContainer.style.display = 'block';
+                
+                updateAnalyzeButton();
+                
+                // Hide any previous results
+                document.getElementById('results').style.display = 'none';
+                
+                // Hide loading state
+                loading.style.display = 'none';
+                loading.querySelector('.loading-text').textContent = 'Analyzing with AI vision...';
+            });
+        }
+
+        function resizeImage(file, callback) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = function() {
+                // Calculate new dimensions
+                const MAX_WIDTH = 1024;
+                const MAX_HEIGHT = 1024;
+                const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes for base64
+                
+                let { width, height } = img;
+                
+                // Resize if too large
+                if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+                    const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+                    width = Math.round(width * ratio);
+                    height = Math.round(height * ratio);
+                }
+                
+                // Set canvas size
+                canvas.width = width;
+                canvas.height = height;
+                
+                // Draw resized image
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Start with high quality
+                let quality = 0.9;
+                let dataUrl;
+                
+                // Reduce quality until file size is acceptable
+                do {
+                    dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    
+                    // If still too large, reduce quality
+                    if (dataUrl.length > MAX_FILE_SIZE && quality > 0.1) {
+                        quality -= 0.1;
+                    } else {
+                        break;
+                    }
+                } while (quality > 0.1);
+                
+                // If still too large after max compression, resize further
+                if (dataUrl.length > MAX_FILE_SIZE) {
+                    const newRatio = Math.sqrt(MAX_FILE_SIZE / dataUrl.length);
+                    const newWidth = Math.round(width * newRatio);
+                    const newHeight = Math.round(height * newRatio);
+                    
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
+                    ctx.drawImage(img, 0, 0, newWidth, newHeight);
+                    dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                }
+                
+                // Log image info
+                const originalKB = Math.round(file.size / 1024);
+                const finalKB = Math.round(dataUrl.length * 0.75 / 1024); // Approximate KB from base64
+                
+                console.log('🖼️ Image processed:', {
+                    originalSize: originalKB + ' KB',
+                    finalSize: finalKB + ' KB',
+                    dimensions: width + 'x' + height,
+                    quality: Math.round(quality * 100) + '%'
+                });
+
+                // Show image info to user
+                const imageInfo = document.getElementById('imageInfo');
+                imageInfo.innerHTML = `📏 Optimized: ${finalKB} KB • ${width}×${height}px • Quality: ${Math.round(quality * 100)}%`;
+                imageInfo.style.display = 'block';
+                
+                callback(dataUrl);
+            };
+            
+            img.onerror = function() {
+                showError('Failed to process image. Please try a different image.');
+                document.getElementById('loading').style.display = 'none';
+            };
+            
+            // Load the image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateAnalyzeButton() {
+            const hasImage = currentImageData !== null;
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            
+            analyzeBtn.disabled = !hasImage;
+            
+            if (!hasImage) {
+                analyzeBtn.textContent = '⚡ Upload Image First';
+            } else {
+                analyzeBtn.textContent = '⚡ Analyze Battery';
+            }
+        }
+
+        async function analyzeImage() {
+            if (!currentImageData) {
+                showError('Please upload an image first.');
+                return;
+            }
+
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            analyzeBtn.disabled = true;
+
+            console.log('🚀 Starting serverless analysis...');
+
+            try {
+                // Call our serverless API function
+                const response = await fetch('/api/analyze-battery', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image: currentImageData
+                    })
+                });
+
+                console.log('📥 Response received:', response.status, response.statusText);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ API Error Response:', errorText);
+                    
+                    let errorMessage = `Analysis failed: ${response.status} ${response.statusText}`;
+                    
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        if (errorData.error) {
+                            errorMessage += `\n\nDetails: ${errorData.error}`;
+                        }
+                    } catch (parseError) {
+                        console.log('⚠️ Could not parse error response as JSON');
+                    }
+                    
+                    throw new Error(errorMessage);
+                }
+
+                const analysisResult = await response.json();
+                console.log('✅ Analysis complete:', analysisResult);
+
+                displayResults(analysisResult);
+                saveAnalysis(analysisResult);
+
+            } catch (error) {
+                console.error('💥 Analysis failed:', error);
+                showDetailedError(error.message, {
+                    imageSize: currentImageData ? Math.round(currentImageData.length * 0.75 / 1024) + ' KB' : '0 KB',
+                    userAgent: navigator.userAgent,
+                    timestamp: new Date().toISOString(),
+                    endpoint: '/api/analyze-battery'
+                });
+            } finally {
+                loading.style.display = 'none';
+                analyzeBtn.disabled = false;
+                updateAnalyzeButton();
+            }
+        }
+
+        function displayResults(analysis) {
+            const resultsContent = document.getElementById('resultsContent');
+            const results = document.getElementById('results');
+            
+            let html = '';
+            
+            if (analysis.is_battery) {
+                html += `<div class="battery-details is-battery">
+                    <h4>✅ Battery Detected</h4>
+                    <p><strong>Type:</strong> ${analysis.object_type || 'Battery'}</p>
+                    <p><strong>Confidence:</strong> ${analysis.confidence || 'High'}</p>`;
+                
+                if (analysis.battery_details) {
+                    const details = analysis.battery_details;
+                    if (details.type) html += `<p><strong>Chemistry:</strong> ${details.type}</p>`;
+                    if (details.voltage) html += `<p><strong>Voltage:</strong> ${details.voltage}</p>`;
+                    if (details.capacity) html += `<p><strong>Capacity:</strong> ${details.capacity}</p>`;
+                    if (details.brand) html += `<p><strong>Brand:</strong> ${details.brand}</p>`;
+                    if (details.model) html += `<p><strong>Model:</strong> ${details.model}</p>`;
+                    if (details.dimensions) html += `<p><strong>Dimensions:</strong> ${details.dimensions}</p>`;
+                    if (details.certifications) html += `<p><strong>Certifications:</strong> ${details.certifications}</p>`;
+                    if (details.condition) html += `<p><strong>Condition:</strong> ${details.condition}</p>`;
+                    if (details.applications) html += `<p><strong>Applications:</strong> ${details.applications}</p>`;
+                }
+                
+                html += `</div>`;
+            } else {
+                html += `<div class="battery-details not-battery">
+                    <h4>❌ Not a Battery</h4>
+                    <p><strong>Object:</strong> ${analysis.object_type || 'Unknown object'}</p>
+                    <p><strong>Confidence:</strong> ${analysis.confidence || 'High'}</p>
+                </div>`;
+            }
+            
+            if (analysis.additional_notes) {
+                html += `<div class="battery-details">
+                    <h4>💡 Additional Information</h4>
+                    <p>${analysis.additional_notes}</p>
+                </div>`;
+            }
+            
+            resultsContent.innerHTML = html;
+            results.style.display = 'block';
+        }
+
+        function saveAnalysis(analysis) {
+            const analysisData = {
+                timestamp: new Date().toISOString(),
+                image: currentImageData,
+                analysis: analysis,
+                serverless: true
+            };
+            
+            // Save to localStorage (could be enhanced to save to cloud storage)
+            const history = JSON.parse(localStorage.getItem('battery_analysis_history') || '[]');
+            history.push(analysisData);
+            localStorage.setItem('battery_analysis_history', JSON.stringify(history));
+            
+            console.log('💾 Analysis saved:', analysisData);
+        }
+
+        function showDetailedError(message, debugInfo = {}) {
+            const results = document.getElementById('results');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            let html = `<div class="error">
+                <h4>❌ Analysis Failed</h4>
+                <p><strong>Error:</strong> ${message}</p>
+                <button class="debug-toggle" onclick="toggleDebugInfo()">🔍 Show Debug Info</button>
+                
+                <div id="debugInfo" class="debug-info" style="display: none;">
+<strong>Debug Information:</strong>
+Image Size: ${debugInfo.imageSize || 'Unknown'}
+Browser: ${debugInfo.userAgent || 'Unknown'}
+Timestamp: ${debugInfo.timestamp || 'Unknown'}
+Endpoint: ${debugInfo.endpoint || 'Unknown'}
+
+<strong>Troubleshooting Steps:</strong>
+1. Check if your Vercel deployment is working
+2. Verify environment variables are set (OPENAI_API_KEY)
+3. Check Vercel function logs for errors
+4. Try a smaller image (under 20MB)
+5. Ensure proper billing setup in OpenAI account
+
+<strong>Common Issues:</strong>
+- 404: API function not deployed correctly
+- 500: Environment variables missing or OpenAI API error
+- 413: Image too large (over 2MB after compression)
+- Network issues: Check internet connection
+                </div>
+            </div>`;
+            
+            resultsContent.innerHTML = html;
+            results.style.display = 'block';
+        }
+
+        function toggleDebugInfo() {
+            const debugInfo = document.getElementById('debugInfo');
+            const isHidden = debugInfo.style.display === 'none';
+            debugInfo.style.display = isHidden ? 'block' : 'none';
+            
+            const button = document.querySelector('.debug-toggle');
+            button.textContent = isHidden ? '🔍 Hide Debug Info' : '🔍 Show Debug Info';
+        }
+
+        function showError(message) {
+            showDetailedError(message);
+        }
+
+        // Initialize
+        updateAnalyzeButton();
+    </script>
+</body>
+</html>
