@@ -674,6 +674,53 @@
                 grid-template-columns: 1fr;
             }
         }
+
+.mobile-upload-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.upload-option-btn {
+    padding: 1.2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    backdrop-filter: blur(20px);
+}
+
+.upload-option-btn:hover {
+    border-color: var(--primary-color);
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+}
+
+/* Hide mobile options on desktop */
+@media (min-width: 768px) {
+    .mobile-upload-options {
+        display: none;
+    }
+}
+
+/* Hide desktop upload on mobile */
+@media (max-width: 767px) {
+    .desktop-upload {
+        display: none;
+    }
+}
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -698,14 +745,27 @@
                 <p>Revolutionary AI-powered battery identification system. Upload any battery image and get instant, detailed analysis powered by advanced computer vision technology.</p>
             </div>
             
-            <div class="upload-card" id="upload">
-                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-                    <div class="upload-icon">📷</div>
-                    <div class="upload-text">Upload Battery Image</div>
-                    <div class="upload-hint">Click to upload or drag & drop • JPG, PNG, WebP</div>
-                </div>
+          <div class="upload-card" id="upload">
+    <!-- Mobile Upload Options -->
+    <div class="mobile-upload-options">
+        <button class="upload-option-btn" onclick="openCamera()">
+            📷 Take Photo
+        </button>
+        <button class="upload-option-btn" onclick="openGallery()">
+            🖼️ Choose from Gallery
+        </button>
+    </div>
 
-                <input type="file" id="fileInput" class="file-input" accept="image/*" capture="environment">
+    <!-- Desktop Upload Area -->
+    <div class="upload-area desktop-upload" onclick="document.getElementById('fileInput').click()">
+        <div class="upload-icon">📷</div>
+        <div class="upload-text">Upload Battery Image</div>
+        <div class="upload-hint">Click to upload or drag & drop • JPG, PNG, WebP</div>
+    </div>
+
+    <!-- Hidden File Inputs -->
+    <input type="file" id="fileInput" class="file-input" accept="image/*">
+    <input type="file" id="cameraInput" class="file-input" accept="image/*" capture="environment">
                 
                 <div class="preview-container" id="previewContainer">
                     <img id="previewImage" class="preview-image" alt="Battery preview">
@@ -759,10 +819,22 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="footer-badge">🚀 Serverless Architecture • Powered by Vercel + OpenAI</div>
+        <div class="footer-badge">🚀 Serverless Architecture • Powered by Netlify + OpenAI</div>
     </footer>
 
     <script>
+
+function openCamera() {
+    document.getElementById('cameraInput').click();
+}
+
+function openGallery() {
+    document.getElementById('fileInput').click();
+}
+
+// Update your existing event listeners (add this line)
+document.getElementById('cameraInput').addEventListener('change', handleFileSelect);
+
         let currentImageData = null;
 
         // Smooth scrolling for navigation
@@ -1098,9 +1170,9 @@ Timestamp: ${debugInfo.timestamp || 'Unknown'}
 Endpoint: ${debugInfo.endpoint || 'Unknown'}
 
 <strong>Troubleshooting Steps:</strong>
-1. Check if your Vercel deployment is working
+1. Check if your Netlify deployment is working
 2. Verify environment variables are set (OPENAI_API_KEY)
-3. Check Vercel function logs for errors
+3. Check Netlify function logs for errors
 4. Try a smaller image (under 20MB)
 5. Ensure proper billing setup in OpenAI account
 
