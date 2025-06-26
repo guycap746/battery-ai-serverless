@@ -1,4 +1,4 @@
-{
+json{
   "functions": {
     "api/analyze-battery.js": {
       "maxDuration": 30
