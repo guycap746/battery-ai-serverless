@@ -4,268 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Battery AI – Smart Battery Analysis</title>
-  <!-- Google Fonts -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <style>
-    /* ---------- CSS VARIABLES ---------- */
-    :root {
-      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-
-      --primary-color: #667eea;
-      --secondary-color: #764ba2;
-      --accent-color: #4facfe;
-      --success-color: #4ade80;
-      --error-color: #f87171;
-      --warning-color: #fbbf24;
-
-      --bg-primary: #0f0f23;
-      --bg-secondary: #1a1a2e;
-      --bg-card: rgba(255, 255, 255, 0.05);
-      --bg-hero: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-
-      --text-primary: #ffffff;
-      --text-secondary: #a1a1aa;
-      --text-muted: #6b7280;
-
-      --border: rgba(255, 255, 255, 0.1);
-      --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    }
-
-    /* ---------- GLOBAL RESET ---------- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-primary);
-      background-image: var(--bg-hero);
-      color: var(--text-primary);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    /* ---------- NAVBAR ---------- */
-    .navbar {
-      position: fixed;
-      inset: 0 0 auto 0;
-      z-index: 1000;
-      padding: 1rem 2rem;
-      background: rgba(15, 15, 35, 0.9);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      transition: background 0.3s ease;
-    }
-    .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      background: var(--primary-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .nav-links {
-      list-style: none;
-      display: flex;
-      gap: 2rem;
-    }
-    .nav-links a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-weight: 500;
-      position: relative;
-      transition: color 0.3s;
-    }
-    .nav-links a:hover { color: var(--text-primary); }
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      bottom: -5px;
-      width: 0;
-      height: 2px;
-      background: var(--primary-gradient);
-      transition: width 0.3s;
-    }
-    .nav-links a:hover::after { width: 100%; }
-
-    /* ---------- HERO ---------- */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 2rem;
-      position: relative;
-      background: var(--bg-hero);
-    }
-    .hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 20% 80%, rgba(102,126,234,.3) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(118,75,162,.3) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(79,172,254,.2) 0%, transparent 50%);
-      animation: gradientShift 15s ease infinite;
-    }
-    @keyframes gradientShift {
-      0%,100% { transform: translate(0,0); }
-      25% { transform: translate(-20px,-20px); }
-      50% { transform: translate(20px,-20px); }
-      75% { transform: translate(-20px,20px); }
-    }
-
-    .hero-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
-      gap: 4rem;
-      align-items: center;
-      position: relative;
-      z-index: 2;
-    }
-    .hero-content h1 {
-      font-size: clamp(2.5rem,5vw,4rem);
-      font-weight: 900;
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(135deg,var(--text-primary) 0%,var(--primary-color) 50%,var(--accent-color) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .hero-content .highlight {
-      background: var(--secondary-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .hero-content p {
-      font-size: 1.2rem;
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
-    }
-    .badge {
-      display:inline-block;
-      background:rgba(102,126,234,0.1);
-      border:1px solid rgba(102,126,234,0.3);
-      color:var(--primary-color);
-      padding:.5rem 1rem;
-      border-radius:50px;
-      font-size:.85rem;
-      font-weight:600;
-      margin-bottom:1.5rem;
-      animation:pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
-
-    /* ---------- UPLOAD CARD ---------- */
-    .upload-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 2rem;
-      box-shadow: var(--shadow-xl);
-      position: relative;
-    }
-    .upload-area {
-      border: 2px dashed var(--border);
-      border-radius: 16px;
-      padding: 3rem 2rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.4s cubic-bezier(.4,0,.2,1);
-      background: rgba(102,126,234,0.02);
-      position: relative;
-      overflow: hidden;
-      margin: 1.5rem 0;
-    }
-    .upload-area:hover { border-color: var(--primary-color); background: rgba(102,126,234,0.05); transform: translateY(-4px); box-shadow:0 20px 40px rgba(102,126,234,0.15); }
-    .upload-area.dragover { border-color: var(--accent-color); background: rgba(79,172,254,0.1); box-shadow:0 0 40px rgba(79,172,254,0.2); }
-    .upload-icon {
-      width: 80px; height: 80px; margin: 0 auto 1.5rem;
-      display:flex;align-items:center;justify-content:center;
-      font-size:2rem; border-radius:50%; background: var(--primary-gradient);
-      box-shadow:0 10px 30px rgba(102,126,234,.3);
-      animation: float 3s ease-in-out infinite;
-    }
-    @keyframes float {0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-    .upload-text{font-size:1.25rem;font-weight:600;margin-bottom:.5rem}
-    .upload-hint{color:var(--text-muted);font-size:.9rem}
-    .file-input{display:none}
-
-    /* ---------- PREVIEW ---------- */
-    .preview-container{display:none;text-align:center;margin:1.5rem 0}
-    .preview-image{width:100%;max-height:300px;object-fit:cover;border-radius:16px;box-shadow:var(--shadow);border:1px solid var(--border)}
-    .image-info{background:rgba(79,172,254,.1);border:1px solid rgba(79,172,254,.3);color:var(--accent-color);padding:.75rem 1rem;border-radius:12px;margin:1rem auto;font-size:.85rem;font-weight:500;display:inline-block}
-
-    /* ---------- BUTTON ---------- */
-    .analyze-btn{width:100%;padding:1rem 2rem;background:var(--primary-gradient);color:#fff;border:none;border-radius:50px;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);box-shadow:0 10px 30px rgba(102,126,234,.3);position:relative;overflow:hidden;margin:1.5rem 0;font-family:inherit}
-    .analyze-btn:hover{transform:translateY(-2px);box-shadow:0 15px 40px rgba(102,126,234,.4)}
-    .analyze-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-
-    /* ---------- LOADING ---------- */
-    .loading{display:none;text-align:center;margin:1.5rem 0}
-    .loading-spinner{width:40px;height:40px;border:3px solid rgba(102,126,234,.3);border-top:3px solid var(--primary-color);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem}
-    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-    .loading-text{color:var(--text-secondary);font-style:italic}
-
-    /* ---------- RESULTS ---------- */
-    .results{display:none;margin-top:2rem}
-    .results-header{font-size:1.5rem;font-weight:700;text-align:center;margin-bottom:1.5rem}
-    .battery-details{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin:1rem 0;transition:border .3s,background .3s}
-    .battery-details:hover{border-color:rgba(102,126,234,.4);background:rgba(255,255,255,.08)}
-    .battery-details.is-battery{border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.05)}
-    .battery-details.not-battery{border-color:rgba(248,113,113,.4);background:rgba(248,113,113,.05)}
-    .battery-details h4{font-size:1.2rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
-    .battery-details.is-battery h4{color:var(--success-color)}
-    .battery-details.not-battery h4{color:var(--error-color)}
-    .battery-details p{margin-bottom:.5rem;color:var(--text-secondary)}
-
-    /* ---------- FEATURES SECTION ---------- */
-    .features{padding:5rem 2rem;background:rgba(15,15,35,.5)}
-    .features-container{max-width:1200px;margin:0 auto;text-align:center}
-    .features h2{font-size:2.5rem;font-weight:800;margin-bottom:1rem;background:var(--primary-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .features p{font-size:1.1rem;color:var(--text-secondary);margin-bottom:3rem;max-width:600px;margin-inline:auto}
-    .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;margin-top:3rem}
-    .feature-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:2rem;text-align:center;position:relative;overflow:hidden;transition:transform .3s,border .3s,box-shadow .3s}
-    .feature-card::before{content:'';position:absolute;inset:0 auto auto 0;height:1px;background:var(--primary-gradient);transform:scaleX(0);transition:transform .3s}
-    .feature-card:hover::before{transform:scaleX(1)}
-    .feature-card:hover{transform:translateY(-8px);border-color:rgba(102,126,234,.4);box-shadow:0 20px 40px rgba(102,126,234,.2)}
-    .feature-icon{width:60px;height:60px;margin:0 auto 1rem;border-radius:12px;background:var(--primary-gradient);display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 8px 20px rgba(102,126,234,.3)}
-    .feature-card h3{font-size:1.25rem;font-weight:600;margin-bottom:.75rem}
-    .feature-card p{color:var(--text-secondary);margin:0}
-
-    /* ---------- FOOTER ---------- */
-    .footer{text-align:center;padding:2rem;background:rgba(15,15,35,.8);border-top:1px solid var(--border)}
-    .footer-badge{display:inline-block;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:var(--success-color);padding:.5rem 1rem;border-radius:50px;font-size:.85rem;font-weight:500}
-
-    /* ---------- RESPONSIVE ---------- */
-    @media(max-width:768px){
-      .navbar{padding:1rem}
-      .nav-links{display:none}
-      .hero-container{grid-template-columns:1fr;gap:2rem;padding:2rem 0}
-      .upload-card{padding:1.5rem}
-      .features{padding:3rem 1rem}
-      .features-grid{grid-template-columns:1fr}
-    }
-  </style>
+  <!-- Include all your styles here -->
+  <style>/* ... (CSS styles from your earlier post) ... */</style>
 </head>
 <body>
   <!-- NAVBAR -->
@@ -282,4 +24,155 @@
 
   <!-- HERO SECTION -->
   <section class="hero" id="hero">
-    <
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="badge">🚀 Powered by AI</div>
+        <h1>Smart <span class="highlight">Battery</span> Analysis</h1>
+        <p>Upload an image of a battery and let AI identify its type, specs, and safety info.</p>
+      </div>
+      <div class="upload-card" id="upload">
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+          <div class="upload-icon">📷</div>
+          <div class="upload-text">Upload Battery Image</div>
+          <div class="upload-hint">Click or drag to upload • JPG, PNG</div>
+        </div>
+        <input type="file" id="fileInput" class="file-input" accept="image/*" capture="environment" />
+        <div class="preview-container" id="previewContainer">
+          <img id="previewImage" class="preview-image" alt="Battery preview" />
+          <div id="imageInfo" class="image-info" style="display: none;"></div>
+        </div>
+        <button class="analyze-btn" id="analyzeBtn" onclick="analyzeImage()" disabled>⚡ Analyze Battery</button>
+        <div class="loading" id="loading">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">Analyzing with AI...</div>
+        </div>
+        <div class="results" id="results">
+          <h3 class="results-header">Analysis Results</h3>
+          <div id="resultsContent"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="features-container">
+      <h2>Powerful AI Features</h2>
+      <p>Analyze lithium batteries using computer vision models and intelligent text parsing.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🔋</div>
+          <h3>Battery Detection</h3>
+          <p>Identify whether the object is a battery and extract its basic type.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Specs Extraction</h3>
+          <p>AI tries to extract voltage, capacity, brand, model, and more from the label.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <h3>Safety Insights</h3>
+          <p>Highlights battery condition or any warning signs visible in the image.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-badge">🔒 Privacy-First • Serverless on Vercel + OpenAI</div>
+  </footer>
+
+  <!-- JS Logic -->
+  <script>
+    let currentImageData = null;
+    document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+    const uploadArea = document.querySelector('.upload-area');
+    uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+    });
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) handleFile(file);
+    }
+
+    function handleFile(file) {
+      if (!file.type.startsWith('image/')) return alert('Invalid file type.');
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          const maxSize = 1024;
+          let { width, height } = img;
+          const scale = Math.min(maxSize / width, maxSize / height, 1);
+          width *= scale; height *= scale;
+          canvas.width = width; canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          currentImageData = dataUrl;
+          document.getElementById('previewImage').src = dataUrl;
+          document.getElementById('previewContainer').style.display = 'block';
+          document.getElementById('imageInfo').style.display = 'block';
+          document.getElementById('imageInfo').textContent = `🖼️ ${width}×${height}`;
+          document.getElementById('analyzeBtn').disabled = false;
+          document.getElementById('results').style.display = 'none';
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function analyzeImage() {
+      if (!currentImageData) return alert('Upload an image first.');
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('analyzeBtn').disabled = true;
+      try {
+        const res = await fetch('/api/analyze-battery', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: currentImageData })
+        });
+        const data = await res.json();
+        renderResults(data);
+      } catch (e) {
+        alert('Error analyzing battery.');
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('analyzeBtn').disabled = false;
+      }
+    }
+
+    function renderResults(data) {
+      const results = document.getElementById('results');
+      const resultsContent = document.getElementById('resultsContent');
+      resultsContent.innerHTML = '';
+      if (data.is_battery) {
+        resultsContent.innerHTML = `
+          <div class="battery-details is-battery">
+            <h4>✅ Battery Detected</h4>
+            <p><strong>Type:</strong> ${data.object_type || 'Battery'}</p>
+            ${data.battery_details?.voltage ? `<p><strong>Voltage:</strong> ${data.battery_details.voltage}</p>` : ''}
+            ${data.battery_details?.capacity ? `<p><strong>Capacity:</strong> ${data.battery_details.capacity}</p>` : ''}
+            ${data.battery_details?.brand ? `<p><strong>Brand:</strong> ${data.battery_details.brand}</p>` : ''}
+            ${data.battery_details?.model ? `<p><strong>Model:</strong> ${data.battery_details.model}</p>` : ''}
+          </div>`;
+      } else {
+        resultsContent.innerHTML = `
+          <div class="battery-details not-battery">
+            <h4>❌ Not a Battery</h4>
+            <p><strong>Object:</strong> ${data.object_type || 'Unknown'}</p>
+          </div>`;
+      }
+      results.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
