@@ -1,4 +1,3 @@
-// Enhanced prompt section for your analyze-battery.js
 const enhancedPrompt = `Analyze this image and determine if it shows a battery. Pay special attention to identifying the correct battery chemistry and type.
 
 CRITICAL: Distinguish between these battery types:
@@ -6,6 +5,7 @@ CRITICAL: Distinguish between these battery types:
    - Lithium Thionyl Chloride (Li-SOCl2) - industrial, backup power
    - Lithium Manganese Dioxide (Li-MnO2) - coin cells, consumer
    - Lithium Iron Disulfide (Li-FeS2) - AA/AAA replacements
+
 2. SECONDARY (rechargeable) lithium batteries:
    - Lithium-ion (Li-ion) - consumer electronics
    - Lithium Polymer (LiPo) - thin devices, drones
@@ -54,25 +54,32 @@ Format your response as JSON:
     "additional_notes": ""
 }`;
 
-// Replace the existing text in your OpenAI API call
-body: JSON.stringify({
-  model: "gpt-4o",
-  messages: [
-    {
-      role: "user",
-      content: [
-        {
-          type: "text",
-          text: enhancedPrompt
-        },
-        {
-          type: "image_url",
-          image_url: {
-            url: image
-          }
-        }
-      ]
-    }
-  ],
-  max_tokens: 1500  // Increased for more detailed response
-})
+// Your API call
+const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        model: "gpt-4o",
+        messages: [
+            {
+                role: "user",
+                content: [
+                    {
+                        type: "text",
+                        text: enhancedPrompt
+                    },
+                    {
+                        type: "image_url",
+                        image_url: {
+                            url: image
+                        }
+                    }
+                ]
+            }
+        ],
+        max_tokens: 1500
+    })
+});
